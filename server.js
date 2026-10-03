@@ -6,7 +6,6 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware to parse JSON in incoming request bodies
 app.use(express.json());
 
 // In-memory mock database
@@ -51,7 +50,6 @@ app.get('/api/v1/users/:id', (req, res) => {
 app.post('/api/v1/users', (req, res) => {
   const { name, role } = req.body;
 
-  // Basic validation
   if (!name || !role) {
     return res.status(400).json({
       success: false,
