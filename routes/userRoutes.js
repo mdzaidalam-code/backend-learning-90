@@ -5,7 +5,7 @@ const {getUsers, getUserById, createUser} = require('../controller/userControlle
 // Route chain for /api/v1/users
 router.route('/')
  .get(getUsers)
- .post(createUser);
+ .post(createUser);                 
 
  // Route chain for /api/v1/users/:id
  router.route('/:id')
