@@ -1,47 +1,52 @@
+const asyncHandler = require('../middleware/asyncHandler')
+
 let users =[
     {id:1, name : 'Zaid', role : 'developer'},
     {id:2, name : 'Sara', role : 'designer'}
 ]
 
-exports.getUsers = (req,res,next) => {
-    try {
+const DBQuery = (data , delay = 500) =>{
+    return new Promise((resolve) => {
+        setTimeout(() => resolve(data),delay)
+    })
+}
+
+exports.getUsers = asyncHandler(
+    async(req,res,next) => {
         const {role} = req.query;
+
+        const dbUsers = await DBQuery(users);
+
         if(role){
-            const filtered = users.filter((u) => u.role === role.toLowerCase())
+            const filtered = dbUsers.filter((u) => u.role === role.toLowerCase())
             return res.status(200).json({ SUccess : true, count : filtered.length, data : filtered});
         }
         res.status(200).json({Success : true, count:users.length, data:users })
-    }
-    catch (err){
-        next(err);
-    }
-}
+    })
 
-exports.getUserById =(req,res,next) =>{
-    try{
+exports.getUserById =asyncHandler(
+    async (req,res,next) =>{
+    
         const userId = parseInt(req.params.id,10);
-        const user = users.find((u) => u.id === userId);
+        const dbUsers = await DBQuery(users);
+        const user = dbUsers.find((u) => u.id === userId);
 
         if (!user) {
             const error = new Error(`User not Found with user ID of ${userId}`)
             error.statusCode = 400;
-            return next(error);
+            throw error
         }
         res.status(200).json({Success: true, data: user} )
-    }
-    catch(err){
-        next(err)
-    }
-}
+    })
 
-exports.createUser = (req,res,next) =>{
-    try{
+exports.createUser = asyncHandler(async(req,res,next) =>{
         const {name, role} = req.body;
+
 
         if(!name || !role){
             const error = new Error('plz provide both name and role');
             error.statusCode = 400;
-            return next(error)
+            throw error
         }
         const newUser = {
             id: users.length+1,
@@ -49,13 +54,10 @@ exports.createUser = (req,res,next) =>{
             role : role.toLowerCase()
         }
         
+        await DBQuery(newUser);
         users.push(newUser)
 
         res.status(201).json({
             Success : true, data:newUser
         })
-    }
-    catch(err){
-        next(err)
-    }
-}
+    })
