@@ -4,6 +4,7 @@ const connectDB = require('./config/db');
 const logger = require('./middleware/logger');
 const errorHandler = require('./middleware/errorHandler');
 const userRoutes = require('./routes/userRoutes');
+const postRoutes = require('./routes/postRoutes');
 
 dotenv.config();
 
@@ -18,6 +19,8 @@ app.use('/api/v1/users', userRoutes);
 app.get('/api/v1/health', (req, res) => {
   res.status(200).json({ success: true, message: 'Server & Database Connected' });
 });
+
+app.use('/api/v1/posts',postRoutes)
 
 app.use((req, res, next) => {
   const error = new Error(`Route not found - ${req.originalUrl}`);
