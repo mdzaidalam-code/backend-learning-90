@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const {getUsers, getUserById, createUser,updateUser,deleteUser} = require('../controller/userController')
+const {getUsers, getUserById, createUser,updateUser,deleteUser,loginUser} = require('../controller/userController')
+
+router.post('/login',loginUser) // or can be written as router.route('/login').post(loginuser)
 
 // Route chain for /api/v1/users
 router.route('/')

@@ -1,3 +1,4 @@
+const { JsonWebTokenError } = require('jsonwebtoken');
 const asyncHandler = require('../middleware/asyncHandler')
 const User = require('../models/User')
 
@@ -67,4 +68,42 @@ exports.deleteUser = asyncHandler(async(req,res,next)=>{
     }
     
     res.status(200).json({ success: true, data: {} });
+})
+
+const generateToken = (id) => {
+    const jwt = require('jsonwebtoken');
+    return jwt.sign({id}, process.env.JWT_SECRET, {expiresIn : process.env.JWT_EXPIRE})
+}
+
+exports.loginUser = asyncHandler(async(req,res,next) => {
+    const {email,password} = req.body
+
+    if(!email || !password){
+        const error = new Error('Please provide email and password')
+        error.statuscode = 400
+        throw error
+    }
+
+    const user = await User.findOne({email}).select('+password')
+
+    if(!user){
+        const error = new Error('Invalid Credentials')
+        error.statuscode = 401
+        throw error
+    }
+
+    const ismatch = await bcrypt.compare(password,user.password);
+
+    if(!ismatch){
+        const error = new Error('Invalid Credentials')
+        error.statuscode = 401
+        throw error
+    }
+
+    const token = generateToken(user._id);
+
+    res.status(200).json({
+        Success : true,
+        token
+    })
 })
